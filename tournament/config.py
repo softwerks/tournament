@@ -23,6 +23,9 @@ parser: argparse.ArgumentParser = argparse.ArgumentParser(
 levels: Tuple[str, ...] = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 parser.add_argument("-l", "--log-level", default="INFO", type=str, choices=levels)
 parser.add_argument(
+    "-r", "--redis", default="redis://localhost:6379", help="redis connection string"
+)
+parser.add_argument(
     "--reload", default=False, action="store_true", help="enable auto reload"
 )
 
@@ -34,4 +37,5 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
+REDIS: str = args.redis
 RELOAD: bool = args.reload
