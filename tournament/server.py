@@ -17,6 +17,10 @@ import logging
 import signal
 import types
 
+from . import matchmaker
+from . import redis
+from . import queue
+
 logger: logging.Logger = logging.getLogger(__name__)
 
 
@@ -24,7 +28,16 @@ async def serve():
     shutdown: asyncio.Future = asyncio.get_running_loop().create_future()
     _register_signal_callbacks(shutdown)
 
+    queue_task = asyncio.create_task(queue.run())
+    matchmaker_task = asyncio.create_task(matchmaker.run())
+    asyncio.gather(queue_task, matchmaker_task)
+
     await shutdown
+
+    queue_task.cancel()
+    matchmaker_task.cancel()
+
+    await redis.close()
 
 
 def _register_signal_callbacks(shutdown: asyncio.Future):
