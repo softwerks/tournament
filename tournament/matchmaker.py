@@ -14,6 +14,7 @@
 
 import asyncio
 import logging
+import time
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -35,6 +36,10 @@ async def run() -> None:
 
 async def match() -> None:
     try:
+        start: float = time.perf_counter()
         await asyncio.sleep(1)
+        elapsed: float = time.perf_counter() - start
+        if elapsed > INTERVAL:
+            logger.warning(f"match loop took {round(elapsed, 1)}s to execute")
     except asyncio.CancelledError:
         pass
