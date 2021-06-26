@@ -11,14 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import argparse
-
-from tournament import Tournament
-
-
-parser = argparse.ArgumentParser(description="Tournament")
-parser.add_argument("-p", "--port", default=5555, type=int, help="port number")
-args = parser.parse_args()
-tournament = Tournament(args.port)
-tournament.run()
