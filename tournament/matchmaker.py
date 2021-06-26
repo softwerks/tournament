@@ -17,11 +17,24 @@ import logging
 
 logger: logging.Logger = logging.getLogger(__name__)
 
+INTERVAL: int = 5
+
 
 async def run() -> None:
     logger.info("matchmaker started")
     try:
         while True:
-            await asyncio.sleep(1)
+            sleep_task: asyncio.Task = asyncio.create_task(asyncio.sleep(INTERVAL))
+            match_task: asyncio.Task = asyncio.create_task(match())
+            await asyncio.gather(sleep_task, match_task)
     except asyncio.CancelledError:
+        sleep_task.cancel()
+        match_task.cancel()
         logger.info("matchmaker stopped")
+
+
+async def match() -> None:
+    try:
+        await asyncio.sleep(1)
+    except asyncio.CancelledError:
+        pass
