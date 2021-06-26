@@ -28,8 +28,8 @@ async def serve():
     shutdown: asyncio.Future = asyncio.get_running_loop().create_future()
     _register_signal_callbacks(shutdown)
 
-    queue_task = asyncio.create_task(queue.run())
-    matchmaker_task = asyncio.create_task(matchmaker.run())
+    queue_task: asyncio.Task = asyncio.create_task(queue.run())
+    matchmaker_task: asyncio.Task = asyncio.create_task(matchmaker.run())
     asyncio.gather(queue_task, matchmaker_task)
 
     await shutdown
