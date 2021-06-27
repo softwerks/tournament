@@ -11,3 +11,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import aioredis
+import logging
+from typing import Optional
+
+from . import config
+
+logger: logging.Logger = logging.getLogger(__name__)
+
+_redis: Optional[aioredis.Redis] = None
+
+
+async def get_connection() -> aioredis.Redis:
+    global _redis
+
+    if _redis is None:
+        _redis = await aioredis.create_redis_pool(config.REDIS)
+        logger.info(f"redis connected on {config.REDIS}")
+
+    return _redis
+
+
+async def close() -> None:
+    global _redis
+
+    if _redis is not None:
+        _redis.close()
+        await _redis.wait_closed()
