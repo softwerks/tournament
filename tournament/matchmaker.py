@@ -22,7 +22,6 @@ INTERVAL: int = 5
 
 
 async def run() -> None:
-    logger.info("matchmaker started")
     try:
         while True:
             sleep_task: asyncio.Task = asyncio.create_task(asyncio.sleep(INTERVAL))
@@ -31,7 +30,6 @@ async def run() -> None:
     except asyncio.CancelledError:
         sleep_task.cancel()
         match_task.cancel()
-        logger.info("matchmaker stopped")
 
 
 async def match() -> None:
