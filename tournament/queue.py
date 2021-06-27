@@ -12,16 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import aioredis
 import asyncio
 import logging
+
+from . import redis
 
 logger: logging.Logger = logging.getLogger(__name__)
 
 
 async def run() -> None:
-    logger.info("queue started")
     try:
-        while True:
-            await asyncio.sleep(1)
+        conn = await redis.get_connection()
+        channel: aioredis.Channel = (await conn.subscribe("tournament:queue"))[0]
+        async for message in channel.iter(encoding="utf-8"):
+            logger.info(message)
     except asyncio.CancelledError:
-        logger.info("queue stopped")
+        conn = await redis.get_connection()
+        await conn.unsubscribe(channel)
