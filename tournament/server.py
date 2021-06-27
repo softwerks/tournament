@@ -16,6 +16,7 @@ import asyncio
 import logging
 import signal
 import types
+from typing import Awaitable
 
 from . import matchmaker
 from . import redis
@@ -30,12 +31,13 @@ async def serve():
 
     queue_task: asyncio.Task = asyncio.create_task(queue.run())
     matchmaker_task: asyncio.Task = asyncio.create_task(matchmaker.run())
-    asyncio.gather(queue_task, matchmaker_task)
+    tasks: Awaitable = asyncio.gather(queue_task, matchmaker_task)
 
     await shutdown
 
     queue_task.cancel()
     matchmaker_task.cancel()
+    await tasks
 
     await redis.close()
 
