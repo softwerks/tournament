@@ -14,19 +14,42 @@
 
 import aioredis
 import asyncio
+import enum
+import json
 import logging
+from typing import Dict
 
 from . import redis
 
 logger: logging.Logger = logging.getLogger(__name__)
 
 
+@enum.unique
+class Opcode(enum.Enum):
+    ADD: str = "add"
+    REM: str = "rem"
+
+
 async def run() -> None:
     try:
-        conn = await redis.get_connection()
+        conn: aioredis.Redis = await redis.get_connection()
         channel: aioredis.Channel = (await conn.subscribe("tournament:queue"))[0]
         async for message in channel.iter(encoding="utf-8"):
-            logger.info(message)
+            await _handle_message(json.loads(message))
     except asyncio.CancelledError:
         conn = await redis.get_connection()
         await conn.unsubscribe(channel)
+
+
+async def _handle_message(message: Dict[str, str]) -> None:
+    conn: aioredis.Redis = await redis.get_connection()
+
+    opcode: Opcode = Opcode(message["opcode"])
+    user: str = message["user"]
+
+    if opcode is Opcode.ADD:
+        await conn.sadd("tournament:queue", user)
+    elif opcode is Opcode.REM:
+        await conn.srem("tournament:queue", user)
+    else:
+        raise ValueError("unsupported opcode")
