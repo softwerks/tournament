@@ -36,6 +36,6 @@ setup(
     install_requires=[
         "aioredis",
     ],
-    extras_require={"dev": ["hupper", "watchdog"]},
+    extras_require={"dev": ["hupper"], "dev-opt": ["watchdog"]},
     entry_points={"console_scripts": ["tournament=tournament.__main__:main"]},
 )
