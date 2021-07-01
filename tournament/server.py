@@ -29,6 +29,8 @@ async def serve():
     shutdown: asyncio.Future = asyncio.get_running_loop().create_future()
     _register_signal_callbacks(shutdown)
 
+    await redis.open()
+
     queue_task: asyncio.Task = asyncio.create_task(queue.run())
     matchmaker_task: asyncio.Task = asyncio.create_task(matchmaker.run())
     tasks: Awaitable = asyncio.gather(queue_task, matchmaker_task)

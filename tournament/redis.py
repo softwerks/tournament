@@ -23,12 +23,18 @@ logger: logging.Logger = logging.getLogger(__name__)
 _redis: Optional[aioredis.Redis] = None
 
 
+async def open() -> None:
+    global _redis
+
+    _redis = await aioredis.create_redis_pool(config.REDIS)
+    logger.info(f"redis connected on {config.REDIS}")
+
+
 async def get_connection() -> aioredis.Redis:
     global _redis
 
     if _redis is None:
-        _redis = await aioredis.create_redis_pool(config.REDIS)
-        logger.info(f"redis connected on {config.REDIS}")
+        raise RuntimeError("no redis connection")
 
     return _redis
 
@@ -39,3 +45,4 @@ async def close() -> None:
     if _redis is not None:
         _redis.close()
         await _redis.wait_closed()
+        logger.info("redis connection closed")
