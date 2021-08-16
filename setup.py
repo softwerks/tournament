@@ -33,9 +33,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.7",
-    install_requires=[
-        "aioredis",
-    ],
+    install_requires=["aioredis", "backgammon"],
     extras_require={"dev": ["hupper"], "dev-opt": ["watchdog"]},
     entry_points={"console_scripts": ["tournament=tournament.__main__:main"]},
 )
