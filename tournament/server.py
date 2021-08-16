@@ -18,6 +18,7 @@ import signal
 import types
 from typing import Awaitable
 
+from . import clock
 from . import matchmaker
 from . import redis
 from . import queue
@@ -33,12 +34,14 @@ async def serve():
 
     queue_task: asyncio.Task = asyncio.create_task(queue.run())
     matchmaker_task: asyncio.Task = asyncio.create_task(matchmaker.run())
+    clock_task: asyncio.Task = asyncio.create_task(clock.run())
     tasks: Awaitable = asyncio.gather(queue_task, matchmaker_task)
 
     await shutdown
 
     queue_task.cancel()
     matchmaker_task.cancel()
+    clock_task.cancel()
     await tasks
 
     await redis.close()
